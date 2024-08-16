@@ -1,7 +1,12 @@
 local cfg = {}
 
-cfg.useGroup = true --[[ If you want to use a group to access the dealership, 
-set this to true and set the group in the next line]]
+--[[
+If you want to use a group to access the dealership, 
+set this to true and set the group in the next line.
+If true, you need to have cardealer added to groups.lua, or this will result in errors.
+]]
+cfg.useGroup = true
+
 cfg.dealership = {
   name = "DealerShip",
   coords = {-32, -1109, 26},

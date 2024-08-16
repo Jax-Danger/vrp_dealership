@@ -57,8 +57,7 @@ local function changeVehicle(self, menu)
               vehicle.display,
               function(player)
                 print("Selected vehicle: " .. vehicle.display)
-                local group = user:getGroup()
-                if group == "cardealer" then
+                if self.cfg.useGroup then
                   self.remote._replaceVehicle(user.source, self, nveh, vehicle.model, {x, y, z})
                 end
               end

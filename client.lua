@@ -79,20 +79,24 @@ function spawnVehicle(self, model, position, useText)
                 local playerCoords = GetEntityCoords(PlayerPedId())
                 local distance = #(vehCoords - playerCoords)
                 if distance < 3.0 then
-                  local text =
-                    string.format(
-                    "Class: %s\nModel: %s\nPrice: $%s",
-                    class,
-                    vehicleClass[1].display or vehicleClass[1].model,
-                    vehicleClass[1].price or "Unknown"
-                  )
-                  DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.25, text)
+                  for _, v in ipairs(vehicleClass) do
+                    if model == v.model then
+                      local text =
+                        string.format(
+                        "Class: %s\nModel: %s\nPrice: $%s",
+                        class,
+                        v.display or v.model,
+                        v.price or "Unknown"
+                      )
+                      DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.25, text)
+                    end
+                  end
                 end
               end
             end
           )
         else
-          print("vehicleClass is nil for class:", class)
+          print("vehicleClass is nil")
         end
       end
     else
@@ -112,7 +116,7 @@ function spawnVehicle(self, model, position, useText)
         while not HasModelLoaded(vehicle) do
           Citizen.Wait(0)
         end
-        local veh = CreateVehicle(vehicle, x, y, z - 0.85, vehPos.rot, true, false)
+        local veh = CreateVehicle(vehicle, x, y, z - 1.0, vehPos.rot, true, false)
         SetVehicleOnGroundProperly(veh) -- Ensure the vehicle is on the ground properly
         SetEntityAsMissionEntity(veh, true, true)
         SetVehicleNumberPlateText(veh, "DEALER")
@@ -121,28 +125,31 @@ function spawnVehicle(self, model, position, useText)
         SetEntityInvincible(veh, true) -- Make the vehicle indestructible
         SetModelAsNoLongerNeeded(vehicle)
 
-        if useText then
-          Citizen.CreateThread(
-            function()
-              while DoesEntityExist(veh) do
-                Citizen.Wait(0)
-                local vehCoords = GetEntityCoords(veh)
-                local playerCoords = GetEntityCoords(PlayerPedId())
-                local distance = #(vehCoords - playerCoords)
-                if distance < 3.0 then
-                  local text =
-                    string.format(
-                    "Class: %s\nModel: %s\nPrice: $%s",
-                    class,
-                    vehicleClass[1].display or vehicleClass[1].model,
-                    vehicleClass[1].price or "Unknown"
-                  )
-                  DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.0, text)
+        -- Ensure text is displayed above the vehicle
+        Citizen.CreateThread(
+          function()
+            while DoesEntityExist(veh) do
+              Citizen.Wait(0)
+              local vehCoords = GetEntityCoords(veh)
+              local playerCoords = GetEntityCoords(PlayerPedId())
+              local distance = #(vehCoords - playerCoords)
+              if distance < 3.0 then
+                for _, v in ipairs(vehicleClass) do
+                  if vehicleClass[1].model == v.model then
+                    local text =
+                      string.format(
+                      "Class: %s\nModel: %s\nPrice: $%s",
+                      class,
+                      v.display or v.model,
+                      v.price or "Unknown"
+                    )
+                    DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.25, text)
+                  end
                 end
               end
             end
-          )
-        end
+          end
+        )
       else
         print("vehicleClass is nil or empty for class:", class)
       end
@@ -223,40 +230,21 @@ function DealerShip:spawnVehicle(self, model)
     return print("No model provided " .. model)
   end
 
-  print("Model provided: " .. model)
-
   local vehicleHash = GetHashKey(model)
-  print("Vehicle hash: " .. vehicleHash)
-
   local x, y, z = table.unpack(self.cfg.vehicle_spawn.coords)
   local rot = self.cfg.vehicle_spawn.rot
-
-  print("Vehicle spawn coordinates: ", x, y, z)
-  print("Vehicle spawn rotation: ", rot)
-
   -- Ensure the coordinates are correct
   if not (x and y and z and rot) then
     return print("Invalid vehicle spawn coordinates.")
   end
-
-  -- Print statement to verify coordinates right before spawning the vehicle
-  print("Attempting to spawn: " .. model .. " at " .. x .. ", " .. y .. ", " .. z .. " with rotation: " .. rot)
-
   -- Spawn the vehicle
-  spawnVehicle(self, model, {x, y, z, rot}, false)
+  --spawnVehicle(self, model, {x, y, z, rot}, false)
+  --teleport player to x,y,z facing rot
+  SetEntityCoords(PlayerPedId(), x, y, z - 1.0)
+  SetEntityHeading(PlayerPedId(), rot)
+  Citizen.Wait(500)
 
-  -- Wait for the vehicle to be created
-  Citizen.Wait(1000)
-
-  -- Get the player's ped and the vehicle entity
-  local ped = PlayerPedId()
-  local vehicle = GetClosestVehicle(x, y, z, 5.0, vehicleHash, 70)
-
-  if vehicle then
-    print("Vehicle spawned: " .. vehicle)
-  else
-    print("Failed to spawn vehicle.")
-  end
+  vRP.EXT.Garage:spawnVehicle(model)
 end
 DealerShip.tunnel.spawnVehicle = DealerShip.spawnVehicle
 
@@ -286,20 +274,9 @@ function DealerShip:replaceVehicle(self, vehtoreplace, replacedveh, position)
   end
 
   if closestCoords and closestRot then
-    -- Adjust position slightly to avoid overlapping
     local spawnX, spawnY, spawnZ = closestCoords[1] + 0.1, closestCoords[2] + 0.1, closestCoords[3]
 
     spawnVehicle(self, replacedveh, {spawnX, spawnY, spawnZ, closestRot}, true)
-
-    for _, category in pairs(self.cfg.display_vehicles.positions) do
-      for _, veh in ipairs(self.cfg.display_vehicles[category]) do
-        if veh.model == replacedveh then
-          print(string.format("Class: %s\nModel: %s\nPrice: $%d", category, replacedveh, veh.price))
-          return
-        end
-      end
-    end
-    print("Vehicle data not found for model: " .. replacedveh)
   else
     print("No positions found in config")
   end

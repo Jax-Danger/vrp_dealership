@@ -51,6 +51,7 @@ function spawnVehicle(self, model, position, useText)
       SetEntityInvincible(veh, true) -- Make the vehicle indestructible
       SetModelAsNoLongerNeeded(vehicle)
       if useText then
+        local vehicleClass = self.cfg.display_vehicles[class]
         Citizen.CreateThread(
           function()
             while DoesEntityExist(veh) do
@@ -58,8 +59,6 @@ function spawnVehicle(self, model, position, useText)
               local vehCoords = GetEntityCoords(veh)
               local playerCoords = GetEntityCoords(PlayerPedId())
               local distance = #(vehCoords - playerCoords)
-              local vehicleClass = self.cfg.display_vehicles[class]
-
               if distance < 3.0 then
                 local text =
                   string.format(
@@ -90,7 +89,7 @@ function spawnVehicle(self, model, position, useText)
         while not HasModelLoaded(vehicle) do
           Citizen.Wait(0)
         end
-        local veh = CreateVehicle(vehicle, x, y, z, vehPos.rot, true, false)
+        local veh = CreateVehicle(vehicle, x, y, z - 0.85, vehPos.rot, true, false)
         SetVehicleOnGroundProperly(veh) -- Ensure the vehicle is on the ground properly
         SetEntityAsMissionEntity(veh, true, true)
         SetVehicleNumberPlateText(veh, "DEALER")

@@ -81,13 +81,18 @@ DealerShip.tunnel.purchaseMenu = DealerShip.purchaseMenu
 
 function DealerShip:getGroup()
   local user = vRP.users_by_source[source]
+  local group = user:getGroup()
   if user then
-    print("Group: " .. user:getGroup())
-    return user:getGroup()
-  else
-    return print(" something wrong")
+    if group == "cardealer" then
+      print("User is a car dealer." .. group)
+      return true
+    else
+      print("User is not a car dealer." .. group)
+      return false
+    end
   end
 end
+DealerShip.tunnel.getGroup = DealerShip.getGroup
 
 -- Constructor
 function DealerShip:__construct()

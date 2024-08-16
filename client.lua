@@ -260,13 +260,16 @@ function DealerShip:spawnVehicle(self, model)
 end
 DealerShip.tunnel.spawnVehicle = DealerShip.spawnVehicle
 
-function DealerShip:replaceVehicle(vehtoreplace, replacedveh, position)
+function DealerShip:replaceVehicle(self, vehtoreplace, replacedveh, position)
   local useGroup = self.cfg.useGroup
   if useGroup then
-    local group = self.remote.getGroup()
-    if group ~= ("group.cardealer" or "cardealer") then
-      vRP.EXT.Base:notify("Only a dealership employee can change vehicles.")
-      return -- Exit the function if the condition is not met
+    local checkGroup = self.remote.getGroup()
+    if checkGroup then
+      print("Group check passed.")
+      goto continue
+    else
+      print("Group check failed.")
+      return
     end
   end
 

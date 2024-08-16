@@ -50,7 +50,7 @@ function spawnVehicle(self, model, position, useText)
   if position then
     local x, y, z, h = position[1], position[2], position[3], position[4]
     if (x and y and z and h) ~= nil then
-      print("loading position: " .. x .. ", " .. y .. ", " .. z .. ", " .. h)
+      print("loading position: " .. x .. ", " .. y .. ", " .. z .. ", " .. h .. " for model: " .. model)
       local vehicle = GetHashKey(model)
       RequestModel(vehicle)
       while not HasModelLoaded(vehicle) do
@@ -64,12 +64,12 @@ function spawnVehicle(self, model, position, useText)
       SetEntityInvincible(veh, true) -- Make the vehicle indestructible
       SetModelAsNoLongerNeeded(vehicle)
       if useText then
-        print("self.cfg.display_vehicles:", json.encode(self.cfg.display_vehicles)) -- Debug print
+        --print("self.cfg.display_vehicles:", json.encode(self.cfg.display_vehicles)) -- Debug print
         local class = getVehicleClassFromModel(self, model)
-        print("model:", model) -- Debug print
-        print("class:", class) -- Debug print
+        --print("model:", model) -- Debug print
+        --print("class:", table.unpack(class)) -- Debug print
         local vehicleClass = self.cfg.display_vehicles[class]
-        print("vehicleClass:", vehicleClass) -- Debug print
+        --print("vehicleClass:", vehicleClass) -- Debug print
         if vehicleClass then
           Citizen.CreateThread(
             function()
@@ -86,7 +86,7 @@ function spawnVehicle(self, model, position, useText)
                     vehicleClass[1].display or vehicleClass[1].model,
                     vehicleClass[1].price or "Unknown"
                   )
-                  DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.0, text)
+                  DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.25, text)
                 end
               end
             end
@@ -103,8 +103,8 @@ function spawnVehicle(self, model, position, useText)
     for posIndex, class in pairs(self.cfg.display_vehicles.positions) do
       local vehPos = self.cfg.positions[posIndex]
       local vehicleClass = self.cfg.display_vehicles[class]
-      print("class:", class)
-      print("vehicleClass:", vehicleClass)
+      --print("class:", class)
+      --print("vehicleClass:", vehicleClass)
       if vehicleClass and #vehicleClass > 0 then
         local x, y, z = table.unpack(vehPos.coords)
         local vehicle = GetHashKey(vehicleClass[1].model)

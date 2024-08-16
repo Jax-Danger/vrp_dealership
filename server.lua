@@ -84,6 +84,8 @@ function DealerShip:getGroup()
   if user then
     print("Group: " .. user:getGroup())
     return user:getGroup()
+  else
+    return print(" something wrong")
   end
 end
 

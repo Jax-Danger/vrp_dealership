@@ -264,7 +264,7 @@ function DealerShip:replaceVehicle(vehtoreplace, replacedveh, position)
   local useGroup = self.cfg.useGroup
   if useGroup then
     local group = self.remote.getGroup()
-    if group ~= "group.cardealer" then
+    if group ~= ("group.cardealer" or "cardealer") then
       vRP.EXT.Base:notify("Only a dealership employee can change vehicles.")
       return -- Exit the function if the condition is not met
     end

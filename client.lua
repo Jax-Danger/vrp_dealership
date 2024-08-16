@@ -261,6 +261,16 @@ end
 DealerShip.tunnel.spawnVehicle = DealerShip.spawnVehicle
 
 function DealerShip:replaceVehicle(vehtoreplace, replacedveh, position)
+  if cfg.useGroup then
+    local group = self.remote.getGroup()
+    if group ~= "group.cardealer" then
+      vRP.EXT.Base:notify("Only a dealership employee can change vehicles.")
+      return -- Exit the function if the condition is not met
+    end
+  end
+
+  ::continue::
+
   local x, y, z = table.unpack(position)
   print(x .. ", " .. y .. ", " .. z)
   print("Replacing vehicle: " .. replacedveh .. " with: " .. vehtoreplace)

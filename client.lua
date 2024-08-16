@@ -33,6 +33,19 @@ function blips(self)
   AddTextComponentString(self.cfg.dealership.name)
   EndTextCommandSetBlipName(blip)
 end
+function getVehicleClassFromModel(model)
+  for class, vehicles in pairs(self.cfg.display_vehicles) do
+    if type(vehicles) == "table" then
+      for _, vehicleData in ipairs(vehicles) do
+        if vehicleData.model == model then
+          return class
+        end
+      end
+    end
+  end
+  return nil
+end
+
 function spawnVehicle(self, model, position, useText)
   if position then
     local x, y, z, h = position[1], position[2], position[3], position[4]
@@ -52,7 +65,7 @@ function spawnVehicle(self, model, position, useText)
       SetModelAsNoLongerNeeded(vehicle)
       if useText then
         print("self.cfg.display_vehicles:", json.encode(self.cfg.display_vehicles)) -- Debug print
-        local class = self.cfg.display_vehicles[model] -- Define class here
+        local class = getVehicleClassFromModel(model)
         print("model:", model) -- Debug print
         print("class:", class) -- Debug print
         local vehicleClass = self.cfg.display_vehicles[class]

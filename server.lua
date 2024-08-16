@@ -79,6 +79,14 @@ function DealerShip:purchaseMenu(action)
 end
 DealerShip.tunnel.purchaseMenu = DealerShip.purchaseMenu
 
+function DealerShip:getGroup()
+  local user = vRP.users_by_source[source]
+  if user then
+    print("Group: " .. user:getGroup())
+    return user:getGroup()
+  end
+end
+
 -- Constructor
 function DealerShip:__construct()
   vRP.Extension.__construct(self)

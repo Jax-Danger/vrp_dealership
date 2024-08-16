@@ -51,10 +51,12 @@ function spawnVehicle(self, model, position, useText)
       SetEntityInvincible(veh, true) -- Make the vehicle indestructible
       SetModelAsNoLongerNeeded(vehicle)
       if useText then
+        print("self.cfg.display_vehicles:", json.encode(self.cfg.display_vehicles)) -- Debug print
         local class = self.cfg.display_vehicles[model] -- Define class here
+        print("model:", model) -- Debug print
+        print("class:", class) -- Debug print
         local vehicleClass = self.cfg.display_vehicles[class]
-        print("class:", class)
-        print("vehicleClass:", vehicleClass)
+        print("vehicleClass:", vehicleClass) -- Debug print
         if vehicleClass then
           Citizen.CreateThread(
             function()

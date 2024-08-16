@@ -33,7 +33,7 @@ function blips(self)
   AddTextComponentString(self.cfg.dealership.name)
   EndTextCommandSetBlipName(blip)
 end
-function spawnVehicle(self, model, position, useText --[[boolean and optional]])
+function spawnVehicle(self, model, position, useText)
   if position then
     local x, y, z, h = position[1], position[2], position[3], position[4]
     if (x and y and z and h) ~= nil then
@@ -46,14 +46,12 @@ function spawnVehicle(self, model, position, useText --[[boolean and optional]])
       local veh = CreateVehicle(vehicle, x, y, z, h, true, false)
       SetVehicleOnGroundProperly(veh)
       SetEntityAsMissionEntity(veh, true, true)
-      SetVehicleHasBeenOwnedByPlayer(veh, true)
-      SetVehicleDirtLevel(veh, 0.0)
-      SetVehicleModKit(veh, 0)
+      -- Lock, freeze, and make the vehicle indestructible
+      SetVehicleDoorsLocked(veh, 2) -- Lock the vehicle
+      FreezeEntityPosition(veh, true) -- Freeze the vehicle
+      SetEntityInvincible(veh, true) -- Make the vehicle indestructible
       -- vehicle no longer needed
       SetModelAsNoLongerNeeded(vehicle)
-
-      local ped = PlayerPedId()
-      SetPedIntoVehicle(ped, veh, -1)
     else
       print("Invalid position data.")
     end
@@ -71,12 +69,13 @@ function spawnVehicle(self, model, position, useText --[[boolean and optional]])
           Citizen.Wait(0)
         end
         local veh = CreateVehicle(vehicle, x, y, z, vehPos.rot, true, false)
-        SetVehicleOnGroundProperly(veh)
         SetEntityAsMissionEntity(veh, true, true)
-        SetVehicleHasBeenOwnedByPlayer(veh, true)
-        SetVehicleDirtLevel(veh, 0.0)
-        SetVehicleModKit(veh, 0)
+        SetVehicleOnGroundProperly(veh)
         SetVehicleNumberPlateText(veh, "DEALER")
+        -- Lock, freeze, and make the vehicle indestructible
+        SetVehicleDoorsLocked(veh, 2) -- Lock the vehicle
+        FreezeEntityPosition(veh, true) -- Freeze the vehicle
+        SetEntityInvincible(veh, true) -- Make the vehicle indestructible
         -- vehicle no longer needed
         SetModelAsNoLongerNeeded(vehicle)
 
@@ -224,12 +223,13 @@ function DealerShip:replaceVehicle(vehtoreplace, replacedveh, position)
 
   -- Delete the vehicle to replace
   local vehicleToReplace = GetClosestVehicle(x, y, z, 3.0, 0, 70)
-  while DoesEntityExist(vehicleToReplace) do
+  if DoesEntityExist(vehicleToReplace) then
     SetEntityAsMissionEntity(vehicleToReplace, true, true)
     DeleteEntity(vehicleToReplace)
     print("Deleted vehicle at position: " .. x .. ", " .. y .. ", " .. z)
     Citizen.Wait(100) -- Wait a bit before checking again
-    vehicleToReplace = GetClosestVehicle(x, y, z, 3.0, 0, 70)
+  else
+    print("No vehicle found to delete at position: " .. x .. ", " .. y .. ", " .. z)
   end
 
   -- Find the closest position and rotation from the config

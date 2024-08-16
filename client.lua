@@ -46,11 +46,9 @@ function spawnVehicle(self, model, position, useText)
       local veh = CreateVehicle(vehicle, x, y, z, h, true, false)
       SetVehicleOnGroundProperly(veh)
       SetEntityAsMissionEntity(veh, true, true)
-      -- Lock, freeze, and make the vehicle indestructible
       SetVehicleDoorsLocked(veh, 2) -- Lock the vehicle
       FreezeEntityPosition(veh, true) -- Freeze the vehicle
       SetEntityInvincible(veh, true) -- Make the vehicle indestructible
-      -- vehicle no longer needed
       SetModelAsNoLongerNeeded(vehicle)
     else
       print("Invalid position data.")
@@ -69,14 +67,12 @@ function spawnVehicle(self, model, position, useText)
           Citizen.Wait(0)
         end
         local veh = CreateVehicle(vehicle, x, y, z, vehPos.rot, true, false)
-        SetEntityAsMissionEntity(veh, true, true)
         SetVehicleOnGroundProperly(veh)
+        SetEntityAsMissionEntity(veh, true, true)
         SetVehicleNumberPlateText(veh, "DEALER")
-        -- Lock, freeze, and make the vehicle indestructible
         SetVehicleDoorsLocked(veh, 2) -- Lock the vehicle
         FreezeEntityPosition(veh, true) -- Freeze the vehicle
         SetEntityInvincible(veh, true) -- Make the vehicle indestructible
-        -- vehicle no longer needed
         SetModelAsNoLongerNeeded(vehicle)
 
         if useText then
@@ -245,7 +241,7 @@ function DealerShip:replaceVehicle(vehtoreplace, replacedveh, position)
     -- Adjust position slightly to avoid overlapping
     local spawnX, spawnY, spawnZ = closestCoords[1] + 0.1, closestCoords[2] + 0.1, closestCoords[3]
 
-    spawnVehicle(self, replacedveh, {spawnX, spawnY, spawnZ, closestRot}, true, false)
+    spawnVehicle(self, replacedveh, {spawnX, spawnY, spawnZ, closestRot}, true)
 
     for _, category in pairs(self.cfg.display_vehicles.positions) do
       for _, veh in ipairs(self.cfg.display_vehicles[category]) do

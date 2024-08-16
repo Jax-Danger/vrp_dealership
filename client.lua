@@ -189,7 +189,7 @@ function DealerShip:getVehPrice(self)
 end
 DealerShip.tunnel.getVehPrice = DealerShip.getVehPrice
 
-function DealerShip:getNearestVehicle(self)
+function DealerShip:getNearestVehicle()
   local playerCoords = GetEntityCoords(PlayerPedId())
   local nearestVehicle = nil
   local nearestDistance = math.huge
@@ -199,29 +199,35 @@ function DealerShip:getNearestVehicle(self)
     local vehicleClass = self.cfg.display_vehicles[class]
 
     if vehicleClass and #vehicleClass > 0 then
-      local x, y, z = table.unpack(position.coords)
-      local distance = Vdist(playerCoords.x, playerCoords.y, playerCoords.z, x, y, z)
+      for _, vehicle in ipairs(vehicleClass) do
+        local x, y, z = table.unpack(position.coords)
+        local distance = Vdist(playerCoords.x, playerCoords.y, playerCoords.z, x, y, z)
 
-      if distance <= 2.5 and distance < nearestDistance then
-        nearestDistance = distance
-        nearestVehicle = {
-          x = x,
-          y = y,
-          z = z,
-          model = vehicleClass[1].model,
-          class = class
-        }
+        if distance <= 2.5 and distance < nearestDistance then
+          nearestDistance = distance
+          local nvehicle = vRP.EXT.Garage:getNearestVehicle(2.0)
+          if nvehicle then
+            local modelHash = GetEntityModel(nvehicle)
+            local modelName = GetDisplayNameFromVehicleModel(modelHash)
+            nearestVehicle = {
+              x = x,
+              y = y,
+              z = z,
+              model = modelName,
+              class = class
+            }
+          end
+        end
       end
     end
   end
 
   if nearestVehicle then
-    print(nearestVehicle.x, nearestVehicle.y, nearestVehicle.z, nearestVehicle.model, nearestVehicle.class)
+    print("Nearest vehicle: " .. nearestVehicle.model)
+    return nearestVehicle
   else
-    print("No nearest vehicle found")
+    return print("No vehicle found within the specified range.")
   end
-
-  return nearestVehicle
 end
 DealerShip.tunnel.getNearestVehicle = DealerShip.getNearestVehicle
 
@@ -242,8 +248,7 @@ function DealerShip:spawnVehicle(self, model)
   --teleport player to x,y,z facing rot
   SetEntityCoords(PlayerPedId(), x, y, z - 1.0)
   SetEntityHeading(PlayerPedId(), rot)
-  Citizen.Wait(500)
-
+  Citizen.Wait(900)
   vRP.EXT.Garage:spawnVehicle(model)
 end
 DealerShip.tunnel.spawnVehicle = DealerShip.spawnVehicle

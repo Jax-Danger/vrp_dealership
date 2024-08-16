@@ -7,19 +7,19 @@ local function purchaseVeh(self)
   if user then
     local curWallet = user:getWallet()
     local vehPrice = self.remote.getVehPrice(user.source, self)
-    local prompt = user:request("Confirm purchase for $" .. vehPrice .. ".", 5)
+    local nvehicle = self.remote.getNearestVehicle(user.source, self)
+    local model = nvehicle.model
+    if model == nil then
+      vRP.EXT.Base.remote._notify(user.source, "No vehicle found. Model is nil.")
+      return
+    end
+    local prompt = user:request("Do you want to purchase " .. model .. " for $" .. vehPrice .. "?", 10)
     if prompt then
       if curWallet >= vehPrice then
         user:tryFullPayment(vehPrice, nil)
-        vRP.EXT.Base.remote._notify(user.source, "You have purchased a vehicle for $" .. vehPrice)
-        local nvehicle = self.remote.getNearestVehicle(user.source, self)
-        local model = nvehicle.model
-        if model == nil then
-          vRP.EXT.Base.remote._notify(user.source, "No vehicle found. Model is nil.")
-          return
-        end
-        print("Spawning vehicle: " .. model)
         self.remote._spawnVehicle(user.source, self, model)
+        vRP.EXT.Base.remote._notify(user.source, "You have purchased a vehicle for $" .. vehPrice)
+        print("Spawning vehicle: " .. model)
       else
         vRP.EXT.Base.remote._notify(user.source, "You do not have enough money to purchase this vehicle.")
       end
@@ -59,6 +59,8 @@ local function changeVehicle(self, menu)
                 print("Selected vehicle: " .. vehicle.display)
                 if self.cfg.useGroup then
                   self.remote._replaceVehicle(user.source, self, nveh, vehicle.model, {x, y, z})
+                  user:closeMenus()
+                  user:openMenu("dealership")
                 end
               end
             )

@@ -51,27 +51,34 @@ function spawnVehicle(self, model, position, useText)
       SetEntityInvincible(veh, true) -- Make the vehicle indestructible
       SetModelAsNoLongerNeeded(vehicle)
       if useText then
+        local class = self.cfg.display_vehicles[model] -- Define class here
         local vehicleClass = self.cfg.display_vehicles[class]
-        Citizen.CreateThread(
-          function()
-            while DoesEntityExist(veh) do
-              Citizen.Wait(0)
-              local vehCoords = GetEntityCoords(veh)
-              local playerCoords = GetEntityCoords(PlayerPedId())
-              local distance = #(vehCoords - playerCoords)
-              if distance < 3.0 then
-                local text =
-                  string.format(
-                  "Class: %s\nModel: %s\nPrice: $%s",
-                  class,
-                  vehicleClass[1].display or vehicleClass[1].model,
-                  vehicleClass[1].price or "Unknown"
-                )
-                DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.0, text)
+        print("class:", class)
+        print("vehicleClass:", vehicleClass)
+        if vehicleClass then
+          Citizen.CreateThread(
+            function()
+              while DoesEntityExist(veh) do
+                Citizen.Wait(0)
+                local vehCoords = GetEntityCoords(veh)
+                local playerCoords = GetEntityCoords(PlayerPedId())
+                local distance = #(vehCoords - playerCoords)
+                if distance < 3.0 then
+                  local text =
+                    string.format(
+                    "Class: %s\nModel: %s\nPrice: $%s",
+                    class,
+                    vehicleClass[1].display or vehicleClass[1].model,
+                    vehicleClass[1].price or "Unknown"
+                  )
+                  DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.0, text)
+                end
               end
             end
-          end
-        )
+          )
+        else
+          print("vehicleClass is nil for class:", class)
+        end
       end
     else
       print("Invalid position data.")
@@ -81,7 +88,8 @@ function spawnVehicle(self, model, position, useText)
     for posIndex, class in pairs(self.cfg.display_vehicles.positions) do
       local vehPos = self.cfg.positions[posIndex]
       local vehicleClass = self.cfg.display_vehicles[class]
-
+      print("class:", class)
+      print("vehicleClass:", vehicleClass)
       if vehicleClass and #vehicleClass > 0 then
         local x, y, z = table.unpack(vehPos.coords)
         local vehicle = GetHashKey(vehicleClass[1].model)
@@ -120,6 +128,8 @@ function spawnVehicle(self, model, position, useText)
             end
           )
         end
+      else
+        print("vehicleClass is nil or empty for class:", class)
       end
     end
   end

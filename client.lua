@@ -261,20 +261,6 @@ end
 DealerShip.tunnel.spawnVehicle = DealerShip.spawnVehicle
 
 function DealerShip:replaceVehicle(self, vehtoreplace, replacedveh, position)
-  local useGroup = self.cfg.useGroup
-  if useGroup then
-    local checkGroup = self.remote.getGroup()
-    if checkGroup then
-      print("Group check passed.")
-      goto continue
-    else
-      print("Group check failed.")
-      return
-    end
-  end
-
-  ::continue::
-
   local x, y, z = table.unpack(position)
   print(x .. ", " .. y .. ", " .. z)
   print("Replacing vehicle: " .. replacedveh .. " with: " .. vehtoreplace)

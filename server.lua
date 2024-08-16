@@ -57,7 +57,10 @@ local function changeVehicle(self, menu)
               vehicle.display,
               function(player)
                 print("Selected vehicle: " .. vehicle.display)
-                self.remote._replaceVehicle(user.source, self, nveh, vehicle.model, {x, y, z})
+                local group = user:getGroup()
+                if group == "cardealer" then
+                  self.remote._replaceVehicle(user.source, self, nveh, vehicle.model, {x, y, z})
+                end
               end
             )
           end
@@ -78,21 +81,6 @@ function DealerShip:purchaseMenu(action)
   end
 end
 DealerShip.tunnel.purchaseMenu = DealerShip.purchaseMenu
-
-function DealerShip:getGroup()
-  local user = vRP.users_by_source[source]
-  local group = user:getGroup()
-  if user then
-    if group == "cardealer" then
-      print("User is a car dealer." .. group)
-      return true
-    else
-      print("User is not a car dealer." .. group)
-      return false
-    end
-  end
-end
-DealerShip.tunnel.getGroup = DealerShip.getGroup
 
 -- Constructor
 function DealerShip:__construct()

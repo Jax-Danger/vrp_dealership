@@ -57,7 +57,7 @@ local function changeVehicle(self, menu)
               vehicle.display,
               function(player)
                 print("Selected vehicle: " .. vehicle.display)
-                self.remote._replaceVehicle(user.source, nveh, vehicle.model, {x, y, z})
+                self.remote._replaceVehicle(user.source, self, nveh, vehicle.model, {x, y, z})
               end
             )
           end

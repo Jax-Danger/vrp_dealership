@@ -4,7 +4,7 @@ DealerShip.tunnel = {}
 function DrawText3D(x, y, z, text)
   local onScreen, _x, _y = World3dToScreen2d(x, y, z)
   local px, py, pz = table.unpack(GetGameplayCamCoords())
-  local scale = 0.35
+  local scale = 0.75
 
   if onScreen then
     SetTextScale(scale, scale)
@@ -50,6 +50,30 @@ function spawnVehicle(self, model, position, useText)
       FreezeEntityPosition(veh, true) -- Freeze the vehicle
       SetEntityInvincible(veh, true) -- Make the vehicle indestructible
       SetModelAsNoLongerNeeded(vehicle)
+      if useText then
+        Citizen.CreateThread(
+          function()
+            while DoesEntityExist(veh) do
+              Citizen.Wait(0)
+              local vehCoords = GetEntityCoords(veh)
+              local playerCoords = GetEntityCoords(PlayerPedId())
+              local distance = #(vehCoords - playerCoords)
+              local vehicleClass = self.cfg.display_vehicles[class]
+
+              if distance < 3.0 then
+                local text =
+                  string.format(
+                  "Class: %s\nModel: %s\nPrice: $%s",
+                  class,
+                  vehicleClass[1].display or vehicleClass[1].model,
+                  vehicleClass[1].price or "Unknown"
+                )
+                DrawText3D(vehCoords.x, vehCoords.y, vehCoords.z + 1.0, text)
+              end
+            end
+          end
+        )
+      end
     else
       print("Invalid position data.")
     end
@@ -67,7 +91,7 @@ function spawnVehicle(self, model, position, useText)
           Citizen.Wait(0)
         end
         local veh = CreateVehicle(vehicle, x, y, z, vehPos.rot, true, false)
-        SetVehicleOnGroundProperly(veh)
+        SetVehicleOnGroundProperly(veh) -- Ensure the vehicle is on the ground properly
         SetEntityAsMissionEntity(veh, true, true)
         SetVehicleNumberPlateText(veh, "DEALER")
         SetVehicleDoorsLocked(veh, 2) -- Lock the vehicle

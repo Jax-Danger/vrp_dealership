@@ -23,15 +23,26 @@ function blips(self)
   local x, y, z = table.unpack(self.cfg.dealership.coords)
   print("blips " .. x, y, z)
   local v = self.cfg.dealership.blip
-  local blip = AddBlipForCoord(x, y, z)
-  SetBlipSprite(blip, v.id)
-  SetBlipDisplay(blip, 4)
-  SetBlipScale(blip, v.scale)
-  SetBlipColour(blip, v.color)
-  SetBlipAsShortRange(blip, true)
-  BeginTextCommandSetBlipName("STRING")
-  AddTextComponentString(self.cfg.dealership.name)
-  EndTextCommandSetBlipName(blip)
+
+  Citizen.CreateThread(
+    function()
+      local blip = AddBlipForCoord(x, y, z)
+      if not DoesBlipExist(blip) then
+        print("Failed to create blip")
+        return
+      end
+
+      SetBlipSprite(blip, v.id)
+      SetBlipDisplay(blip, 4)
+      SetBlipScale(blip, v.scale)
+      SetBlipColour(blip, v.color)
+      SetBlipAsShortRange(blip, true)
+      BeginTextCommandSetBlipName("STRING")
+      AddTextComponentString(self.cfg.dealership.name)
+      EndTextCommandSetBlipName(blip)
+      print("Blip created successfully")
+    end
+  )
 end
 function getVehicleClassFromModel(self, model)
   for class, vehicles in pairs(self.cfg.display_vehicles) do
@@ -54,7 +65,7 @@ function spawnVehicle(self, model, position, useText)
       local vehicle = GetHashKey(model)
       RequestModel(vehicle)
       while not HasModelLoaded(vehicle) do
-        Citizen.Wait(0)
+        Citizen.Wait(10)
       end
       local veh = CreateVehicle(vehicle, x, y, z, h, true, false)
       SetVehicleOnGroundProperly(veh)
@@ -74,7 +85,7 @@ function spawnVehicle(self, model, position, useText)
           Citizen.CreateThread(
             function()
               while DoesEntityExist(veh) do
-                Citizen.Wait(0)
+                Citizen.Wait(10)
                 local vehCoords = GetEntityCoords(veh)
                 local playerCoords = GetEntityCoords(PlayerPedId())
                 local distance = #(vehCoords - playerCoords)
@@ -114,7 +125,7 @@ function spawnVehicle(self, model, position, useText)
         local vehicle = GetHashKey(vehicleClass[1].model)
         RequestModel(vehicle)
         while not HasModelLoaded(vehicle) do
-          Citizen.Wait(0)
+          Citizen.Wait(10)
         end
         local veh = CreateVehicle(vehicle, x, y, z - 1.0, vehPos.rot, true, false)
         SetVehicleOnGroundProperly(veh) -- Ensure the vehicle is on the ground properly
@@ -129,7 +140,7 @@ function spawnVehicle(self, model, position, useText)
         Citizen.CreateThread(
           function()
             while DoesEntityExist(veh) do
-              Citizen.Wait(0)
+              Citizen.Wait(10)
               local vehCoords = GetEntityCoords(veh)
               local playerCoords = GetEntityCoords(PlayerPedId())
               local distance = #(vehCoords - playerCoords)
@@ -248,7 +259,7 @@ function DealerShip:spawnVehicle(self, model)
   --teleport player to x,y,z facing rot
   SetEntityCoords(PlayerPedId(), x, y, z - 1.0)
   SetEntityHeading(PlayerPedId(), rot)
-  Citizen.Wait(900)
+  Citizen.Wait(1000)
   vRP.EXT.Garage:spawnVehicle(model)
 end
 DealerShip.tunnel.spawnVehicle = DealerShip.spawnVehicle
@@ -264,7 +275,7 @@ function DealerShip:replaceVehicle(self, vehtoreplace, replacedveh, position)
     SetEntityAsMissionEntity(vehicleToReplace, true, true)
     DeleteEntity(vehicleToReplace)
     print("Deleted vehicle at position: " .. x .. ", " .. y .. ", " .. z)
-    Citizen.Wait(100) -- Wait a bit before checking again
+    Citizen.Wait(500) -- Wait a bit before checking again
   else
     print("No vehicle found to delete at position: " .. x .. ", " .. y .. ", " .. z)
   end
@@ -305,7 +316,7 @@ function DealerShip:__construct()
       while true do
         local playerPed = PlayerPedId()
         playerCoords = GetEntityCoords(playerPed)
-        Citizen.Wait(500) -- Update every 500 ms
+        Citizen.Wait(1000) -- Update every 1000 ms
       end
     end
   )
@@ -339,7 +350,7 @@ function DealerShip:__construct()
             isMenuOpen = false
           end
         end
-        Citizen.Wait(500) -- Check every 500 ms
+        Citizen.Wait(1500) -- Check every 1500 ms
       end
     end
   )

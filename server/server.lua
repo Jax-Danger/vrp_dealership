@@ -8,7 +8,7 @@ Dealerships.tunnel = {}
 function Dealerships:__construct()
   vRP.Extension.__construct(self)
   -- load config
-  self.cfg = module("vrp_dealerships", "cfg/cfg")
+  self.cfg = module("vrp_dealership", "cfg/cfg")
 end
 
 function Dealerships:purchaseVehicle(self, name, model, price)

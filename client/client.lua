@@ -8,7 +8,7 @@ local pvRP = {}
 -- load script in vRP context
 pvRP.loadScript = module
 Proxy.addInterface("vRP", pvRP)
-local cfg = module("vrp_dealerships", "cfg/cfg")
+local cfg = module("vrp_dealership", "cfg/cfg")
 
 local Dealerships = class("Dealerships", vRP.Extension)
 

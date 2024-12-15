@@ -1,29 +1,29 @@
---Main Information
 fx_version "cerulean"
-game "gta5"
+lua54 "yes"
+games {"gta5"}
 lua54 "yes"
 
-dependencies {
-  "vrp"
+ui_page "cfg/html/index.html"
+
+dependency "vrp"
+
+shared_scripts {
+  '@ox_lib/init.lua',
 }
 
 server_script {
   "@vrp/lib/utils.lua",
-  "server_vrp.lua"
+  "server/vrp_s.lua"
 }
 
 client_script {
   "@vrp/lib/utils.lua",
-  "cl_vrp.lua"
+  'client/client.lua'
 }
 
 files {
-  "client.lua",
-  "cfg/cfg.lua"
+  "cfg/cfg.lua",
+  'cfg/html/index.html',
+  'cfg/html/assets/*.js',
+  'cfg/html/assets/*.css'
 }
-
-shared_scripts {
-  "@ox_lib/init.lua"
-}
-
-escrow_ignore "cfg/cfg.lua"

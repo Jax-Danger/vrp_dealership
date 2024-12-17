@@ -29,13 +29,6 @@ function Dealerships:purchaseVehicle(self, name, model, price)
   end
 end
 
--- function Dealerships:setVehicleAsOwned(model)
---   local user = vRP.users_by_source[source]
---   local uvehicles = user:getVehicles()
---   if uvehicles == nil then return print('uvechicles is nil') end
---   uvehicles[prompt] = 1
---   print(json.encode(uvehicles)) -- debug print
--- end
 
 Dealerships.tunnel={}
 Dealerships.tunnel.purchaseVehicle = Dealerships.purchaseVehicle
